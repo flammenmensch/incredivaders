@@ -9,7 +9,7 @@ import ArrowMovementMixin from '../mixins/ArrowMovementMixin';
 
 export default class PlayState extends Phaser.State {
   create() {
-    const PlayerClass = AutoFireMixin(ArrowMovementMixin(
+    const PlayerClass = ManualFireMixin(ArrowMovementMixin(
       ArmedEntityMixin(
         Player, { x: 0, y: 0 }, weaponFactory(WeaponType.LASER, false)
       )
@@ -18,7 +18,7 @@ export default class PlayState extends Phaser.State {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.game.add.sprite(0, 0, 'space');
 
-    const player = this.game.add.existing(new PlayerClass(this.game, this.game.width * .5, this.game.height - 144));
+    const player = this.game.add.existing(new PlayerClass(this.game, this.game.width * .5, this.game.height - 44));
 
     const EnemyClass = LookAtMixin(AutoFireMixin(
       ArmedEntityMixin(
