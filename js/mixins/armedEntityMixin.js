@@ -12,7 +12,7 @@ export default function armedEntityMixinFactory(x, y, weaponBuilder, target=null
         return this.__weapon;
       }
       fire() {
-        if (this.__target) {
+        if (this.__target && this.__target.alive) {
           this.__weapon.fireAtSprite(this.__target);
         } else {
           this.__weapon.fireAngle = this.__originalFireAngle + this.angle;

@@ -30,10 +30,6 @@ export default function(acceleration=600, maxSpeed=400, drag=400, padding=32) {
           this.x = padding;
           this.body.acceleration.x = 0;
         }
-
-        let bank = this.body.velocity.x / maxSpeed;
-        this.scale.x = 1 - Math.abs(bank) * .5;
-        this.angle = bank * 15;
       }
     }
   }
