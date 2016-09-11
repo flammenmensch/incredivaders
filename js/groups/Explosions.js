@@ -14,7 +14,7 @@ export default class Explosions extends Phaser.Group {
   explode(target) {
     const explosion = this.getFirstExists(false);
     explosion.reset(target.body.x + target.body.halfWidth, target.body.y + target.body.halfHeight);
-    explosion.body.velocity.y = target.body.velocity.y;
+    explosion.body.velocity.y = this.game.math.min(target.body.velocity.y, 180);
     explosion.play('explosion', 30 , false, true);
   }
 }

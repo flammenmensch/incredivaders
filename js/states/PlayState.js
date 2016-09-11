@@ -8,10 +8,13 @@ import Enemy from '../sprites/Enemy';
 import mix from '../mixins/mix';
 import mixins from '../mixins';
 
+import randomLaunchStrategy from '../strategies/randomLaunchStrategy';
+import queueLaunchStrategy from '../strategies/queueLaunchStrategy';
+
 const createBlackEnemy = () => mix(Enemy).with(
-  mixins.randomMovementMixinFactory(500),
+  mixins.waveMovementFactory(),
   mixins.randomRotationMixinFactory(),
-  mixins.bankMixinFactory(500),
+  mixins.bankMixinFactory(180),
   mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, true)),
   mixins.autoFireMixinFactory()
 );
@@ -20,8 +23,15 @@ const createRedEnemy = (target) => mix(Enemy).with(
   mixins.randomMovementMixinFactory(),
   mixins.randomRotationMixinFactory(),
   mixins.bankMixinFactory(),
-  mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.ROCKET, true)),
+  mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.ROCKET, true, target)),
   mixins.autoFireMixinFactory()
+);
+
+const createBlueEnemy = () => mix(Enemy).with(
+  mixins.randomMovementMixinFactory(400),
+  mixins.randomRotationMixinFactory(),
+  mixins.bankMixinFactory(400),
+  mixins.accelerateAfterFactory(100, 75)
 );
 
 export default class PlayState extends Phaser.State {
@@ -38,8 +48,9 @@ export default class PlayState extends Phaser.State {
 
     this.player = this.game.add.existing(new PlayerClass(this.game, this.game.width * .5, this.game.height - 44));
     this.enemies = [
-      this.game.add.existing(new Enemies(this.game, createBlackEnemy(), 'enemyBlack', 10, 300, 1500)),
-      this.game.add.existing(new Enemies(this.game, createRedEnemy(this.player), 'enemyRed', 5, 3000, 6000))
+      this.game.add.existing(new Enemies(this.game, createBlackEnemy(), 'enemyBlack', queueLaunchStrategy(300, 1500, 50), 10)),
+      this.game.add.existing(new Enemies(this.game, createRedEnemy(this.player), 'enemyRed', randomLaunchStrategy(3000, 6000), 5)),
+      this.game.add.existing(new Enemies(this.game, createBlueEnemy(), 'enemyBlue', randomLaunchStrategy(5000, 7500), 5))
     ];
     this.explosions = this.game.add.existing(new Explosions(this.game));
 
@@ -48,6 +59,7 @@ export default class PlayState extends Phaser.State {
       .reduce((acc, group) => {
         return acc.concat(group.children);
       }, [])
+      .filter(enemy => enemy.weapon !== undefined) // Armed enemies only
       .map(enemy => enemy.weapon.bullets);
   }
   update() {
