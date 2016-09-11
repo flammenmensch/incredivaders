@@ -6,7 +6,8 @@ import armedEntityMixinFactory from '../mixins/armedEntityMixin';
 import manualFireMixinFactory from '../mixins/manualFireMixin';
 import arrowMovementMixinFactory from '../mixins/arrowMovementMixin';
 import bankMixinFactory from '../mixins/bankMixin';
-import EnemyGroup from '../groups/EnemyGroup';
+import Enemies from '../groups/Enemies';
+import Explosions from '../groups/Explosions';
 
 export default class PlayState extends Phaser.State {
   create() {
@@ -21,7 +22,8 @@ export default class PlayState extends Phaser.State {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     this.player = this.game.add.existing(new PlayerClass(this.game, this.game.width * .5, this.game.height - 44));
-    this.enemies = this.game.add.existing(new EnemyGroup(this.game, this.player));
+    this.enemies = this.game.add.existing(new Enemies(this.game, this.player));
+    this.explosions = this.game.add.existing(new Explosions(this.game));
 
     this.playerBullets = this.player.weapon.bullets;
     this.enemyBullets = this.enemies.children.map(enemy => enemy.weapon.bullets);
@@ -32,15 +34,18 @@ export default class PlayState extends Phaser.State {
     this.game.physics.arcade.overlap(this.player, this.enemyBullets, this.hitPlayer, null, this);
   }
   collideShips(player, enemy) {
-    // TODO Add explosion
+    this.explosions.explode(enemy);
+    //this.explosions.explode(player);
+    //player.kill();
     enemy.kill();
   }
   hitEnemy(enemy, bullet) {
+    this.explosions.explode(enemy);
     bullet.kill();
     enemy.kill();
   }
   hitPlayer(player, bullet) {
-    player.kill();
+    //player.kill();
     bullet.kill();
   }
 }

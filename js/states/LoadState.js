@@ -4,6 +4,7 @@ export default class LoadState extends Phaser.State {
     this.game.load.image('player', 'assets/images/playerShip1_orange.png');
     this.game.load.image('enemy', 'assets/images/enemyBlack3.png');
     this.game.load.image('laser', 'assets/images/laserRed01.png');
+    this.game.load.spritesheet('explosion', 'assets/images/explosion_9.png', 256, 256);
   }
   create() {
     this.game.state.start('play');

@@ -10,7 +10,7 @@ import mix from '../mixins/mix';
 const MIN_SPACING = 300;
 const MAX_SPACING = 3000;
 
-export default class EnemyGroup extends Phaser.Group {
+export default class Enemies extends Phaser.Group {
   constructor(game, player) {
     super(game);
 
