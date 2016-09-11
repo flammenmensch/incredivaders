@@ -1,30 +1,25 @@
 import weaponFactory, { WeaponType } from '../weapons/weaponFactory';
 import Player from '../sprites/Player';
-import Enemy from '../sprites/Enemy';
-import ArmedEntityMixin from '../mixins/ArmedEntityMixin';
-import AutoFireMixin from '../mixins/AutoFireMixin';
-import ManualFireMixin from '../mixins/ManualFireMixin';
-import LookAtMixin from '../mixins/LookAtMixin';
-import ArrowMovementMixin from '../mixins/ArrowMovementMixin';
+import StarField from '../sprites/StarField';
+import mix from '../mixins/mix';
+import armedEntityMixinFactory from '../mixins/armedEntityMixin';
+import manualFireMixinFactory from '../mixins/manualFireMixin';
+import arrowMovementMixinFactory from '../mixins/arrowMovementMixin';
+import EnemyGroup from '../groups/EnemyGroup';
 
 export default class PlayState extends Phaser.State {
   create() {
-    const PlayerClass = ManualFireMixin(ArrowMovementMixin(
-      ArmedEntityMixin(
-        Player, { x: 0, y: 0 }, weaponFactory(WeaponType.LASER, false)
-      )
-    ));
+    const PlayerClass = mix(Player).with(
+      armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, false)),
+      arrowMovementMixinFactory(),
+      manualFireMixinFactory()
+    );
 
+    this.game.add.existing(new StarField(this.game));
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
-    this.game.add.sprite(0, 0, 'space');
 
     const player = this.game.add.existing(new PlayerClass(this.game, this.game.width * .5, this.game.height - 44));
 
-    const EnemyClass = LookAtMixin(AutoFireMixin(
-      ArmedEntityMixin(
-        Enemy, { x: 0, y: 0 }, weaponFactory(WeaponType.LASER, true), player
-      )
-    ), player);
-    this.game.add.existing(new EnemyClass(this.game, this.game.width * .5, 44));
+    this.game.add.existing(new EnemyGroup(this.game, player));
   }
 }

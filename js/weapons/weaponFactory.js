@@ -18,10 +18,11 @@ export default function(type, isEnemy=false) {
 
 const laserBuilder = (isEnemy, owner) => {
   const weapon = owner.game.add.weapon(30, WeaponType.LASER);
-  weapon.bulletSpeed = 300;
+  weapon.bulletSpeed = 600;
   weapon.bulletAngleOffset = 90;
   weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-  weapon.fireRate = isEnemy ? 5000 : 150;
+  weapon.fireRate = isEnemy ? 500 : 150;
+  weapon.fireAngle = isEnemy ? 90 : -90;
   weapon.trackSprite(owner);
   return weapon;
 };
