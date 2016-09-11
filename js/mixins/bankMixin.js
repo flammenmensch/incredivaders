@@ -1,4 +1,4 @@
-export default function(maxSpeed=600) {
+export default function(maxSpeed=300) {
   return function(SuperClass) {
     return class extends SuperClass {
       update() {

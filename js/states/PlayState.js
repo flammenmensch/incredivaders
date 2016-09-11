@@ -1,32 +1,54 @@
 import weaponFactory, { WeaponType } from '../weapons/weaponFactory';
 import Player from '../sprites/Player';
 import StarField from '../sprites/StarField';
-import mix from '../mixins/mix';
-import armedEntityMixinFactory from '../mixins/armedEntityMixin';
-import manualFireMixinFactory from '../mixins/manualFireMixin';
-import arrowMovementMixinFactory from '../mixins/arrowMovementMixin';
-import bankMixinFactory from '../mixins/bankMixin';
 import Enemies from '../groups/Enemies';
 import Explosions from '../groups/Explosions';
+import Enemy from '../sprites/Enemy';
+
+import mix from '../mixins/mix';
+import mixins from '../mixins';
+
+const createBlackEnemy = () => mix(Enemy).with(
+  mixins.randomMovementMixinFactory(500),
+  mixins.randomRotationMixinFactory(),
+  mixins.bankMixinFactory(500),
+  mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, true)),
+  mixins.autoFireMixinFactory()
+);
+
+const createRedEnemy = (target) => mix(Enemy).with(
+  mixins.randomMovementMixinFactory(),
+  mixins.randomRotationMixinFactory(),
+  mixins.bankMixinFactory(),
+  mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.ROCKET, true)),
+  mixins.autoFireMixinFactory()
+);
 
 export default class PlayState extends Phaser.State {
   create() {
     const PlayerClass = mix(Player).with(
-      armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, false)),
-      bankMixinFactory(),
-      arrowMovementMixinFactory(),
-      manualFireMixinFactory()
+      mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, false)),
+      mixins.bankMixinFactory(),
+      mixins.arrowMovementMixinFactory(),
+      mixins.manualFireMixinFactory()
     );
 
     this.game.add.existing(new StarField(this.game));
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
     this.player = this.game.add.existing(new PlayerClass(this.game, this.game.width * .5, this.game.height - 44));
-    this.enemies = this.game.add.existing(new Enemies(this.game, this.player));
+    this.enemies = [
+      this.game.add.existing(new Enemies(this.game, createBlackEnemy(), 'enemyBlack', 10, 300, 1500)),
+      this.game.add.existing(new Enemies(this.game, createRedEnemy(this.player), 'enemyRed', 5, 3000, 6000))
+    ];
     this.explosions = this.game.add.existing(new Explosions(this.game));
 
     this.playerBullets = this.player.weapon.bullets;
-    this.enemyBullets = this.enemies.children.map(enemy => enemy.weapon.bullets);
+    this.enemyBullets = this.enemies
+      .reduce((acc, group) => {
+        return acc.concat(group.children);
+      }, [])
+      .map(enemy => enemy.weapon.bullets);
   }
   update() {
     this.game.physics.arcade.overlap(this.player, this.enemies, this.collideShips, null, this);

@@ -4,7 +4,7 @@ export default class Explosions extends Phaser.Group {
 
     this.enableBody = true;
     this.physicsBodyType = Phaser.Physics.ARCADE;
-    this.createMultiple(30, 'explosion');
+    this.createMultiple(30, 'redExplosion');
     this.setAll('anchor.x', .5);
     this.setAll('anchor.y', .5);
     this.forEach(explosion => {
@@ -15,6 +15,6 @@ export default class Explosions extends Phaser.Group {
     const explosion = this.getFirstExists(false);
     explosion.reset(target.body.x + target.body.halfWidth, target.body.y + target.body.halfHeight);
     explosion.body.velocity.y = target.body.velocity.y;
-    explosion.play('explosion', 30, false, true);
+    explosion.play('explosion', 30 , false, true);
   }
 }
