@@ -104,7 +104,6 @@ export default class PlayState extends Phaser.State {
     }
   }
   restart() {
-    this.enemies.forEach(group => group.callAll('kill'));
     this.player.revive();
     this.player.health = 100;
   }
