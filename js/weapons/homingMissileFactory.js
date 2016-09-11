@@ -6,12 +6,14 @@ export default function(target) {
   return class HomingMissile extends Phaser.Bullet {
     constructor(game, x, y) {
       super(game, x, y, 'rocket');
+      this.targetX = target.body.x;
+      this.targetY = target.body.y;
     }
     update() {
       if (this.alive) {
         const targetAngle = this.game.math.angleBetween(
           this.x, this.y,
-          target.body.x, target.body.y
+          this.targetX, this.targetY
         );
 
         if (this.rotation !== targetAngle) {
@@ -40,14 +42,14 @@ export default function(target) {
         }
       }
 
-      /*const distance = this.game.math.distance(
+      const distance = this.game.math.distance(
         this.x, this.y,
-        target.body.x, target.body.y
+        this.targetX, this.targetY
       );
 
       if (distance < 50) {
         this.kill();
-      }*/
+      }
     }
   }
 }

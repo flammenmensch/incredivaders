@@ -61,16 +61,33 @@ export default class PlayState extends Phaser.State {
       }, [])
       .filter(enemy => enemy.weapon !== undefined) // Armed enemies only
       .map(enemy => enemy.weapon.bullets);
+
+    this.health = this.game.add.text(
+      this.game.world.width - 150,
+      10,
+      `Health: ${this.player.health}%`,
+      { font: '20px Arial', fill: '#fff' }
+    );
   }
   update() {
     this.game.physics.arcade.overlap(this.player, this.enemies, this.collideShips, null, this);
     this.game.physics.arcade.overlap(this.enemies, this.playerBullets, this.hitEnemy, null, this);
     this.game.physics.arcade.overlap(this.player, this.enemyBullets, this.hitPlayer, null, this);
+    this.health.text = `Health: ${this.player.health}%`;
+
+    //  Game over?
+    if (!this.player.alive) {
+      const tapRestart = this.game.input.onTap.addOnce(() => {
+        tapRestart.detach();
+        this.restart();
+      });
+    }
   }
   collideShips(player, enemy) {
     this.explosions.explode(enemy);
-    //this.explosions.explode(player);
-    //player.kill();
+    this.explosions.explode(player);
+    player.damage(100);
+    player.kill();
     enemy.kill();
   }
   hitEnemy(enemy, bullet) {
@@ -79,7 +96,16 @@ export default class PlayState extends Phaser.State {
     enemy.kill();
   }
   hitPlayer(player, bullet) {
-    //player.kill();
     bullet.kill();
+    player.damage(20);
+    if (player.health <= 0) {
+      this.explosions.explode(player);
+      player.kill();
+    }
+  }
+  restart() {
+    this.enemies.forEach(group => group.callAll('kill'));
+    this.player.revive();
+    this.player.health = 100;
   }
 }
