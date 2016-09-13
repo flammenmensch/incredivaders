@@ -34,6 +34,11 @@ const createBlueEnemy = () => mix(Enemy).with(
   mixins.accelerateAfterFactory(100, 75)
 );
 
+const createMeteor = (rotation, speed) => mix(Enemy).with(
+  mixins.simpleRotationFactory(rotation, Math.random() >= 0.5),
+  mixins.simpleMovementFactory(speed)
+);
+
 export default class PlayState extends Phaser.State {
   create() {
     const PlayerClass = mix(Player).with(
@@ -52,7 +57,13 @@ export default class PlayState extends Phaser.State {
       this.game.add.existing(new Enemies(this.game, createRedEnemy(this.player), 'enemyRed', randomLaunchStrategy(3000, 6000), 5)),
       this.game.add.existing(new Enemies(this.game, createBlueEnemy(), 'enemyBlue', randomLaunchStrategy(5000, 7500), 5))
     ];
-    this.explosions = this.game.add.existing(new Explosions(this.game));
+    this.meteors = [
+      this.game.add.existing(new Enemies(this.game, createMeteor(1, 250), 'meteorBig1', randomLaunchStrategy(10000, 15000), 2)),
+      this.game.add.existing(new Enemies(this.game, createMeteor(3, 300), 'meteorMed1', randomLaunchStrategy(8000, 16000), 5)),
+      this.game.add.existing(new Enemies(this.game, createMeteor(3, 400), 'meteorTiny1', randomLaunchStrategy(5000, 10000), 5)),
+      this.game.add.existing(new Enemies(this.game, createMeteor(3, 400), 'meteorTiny2', randomLaunchStrategy(5000, 10000), 5)),
+    ];
+    this.explosions = this.game.add.existing(new Explosions(this.game, 'redExplosion'));
 
     this.playerBullets = this.player.weapon.bullets;
     this.enemyBullets = this.enemies
@@ -73,6 +84,8 @@ export default class PlayState extends Phaser.State {
     this.game.physics.arcade.overlap(this.player, this.enemies, this.collideShips, null, this);
     this.game.physics.arcade.overlap(this.enemies, this.playerBullets, this.hitEnemy, null, this);
     this.game.physics.arcade.overlap(this.player, this.enemyBullets, this.hitPlayer, null, this);
+    this.game.physics.arcade.overlap([ this.player, ...this.enemies ], this.meteors, this.collideMeteors, null, this);
+    this.game.physics.arcade.overlap([ this.playerBullets, this.enemyBullets ], this.meteors, this.hitMeteor, null, this);
     this.health.text = `Health: ${this.player.health}%`;
 
     //  Game over?
@@ -90,21 +103,32 @@ export default class PlayState extends Phaser.State {
     player.kill();
     enemy.kill();
   }
+  collideMeteors(entity) {
+    this.explosions.explode(entity);
+    entity.kill();
+  }
   hitEnemy(enemy, bullet) {
-    this.explosions.explode(enemy);
     bullet.kill();
-    enemy.kill();
+    enemy.damage(Math.round(Math.random() * 10) + 20);
+    if (enemy.health <= 0) {
+      this.explosions.explode(enemy);
+      enemy.kill();
+    }
   }
   hitPlayer(player, bullet) {
     bullet.kill();
-    player.damage(20);
+    player.damage(5);
     if (player.health <= 0) {
       this.explosions.explode(player);
       player.kill();
     }
   }
+  hitMeteor(bullet) {
+    bullet.kill();
+  }
   restart() {
     this.player.revive();
     this.player.health = 100;
+    this.player.body.velocity.x = 0;
   }
 }

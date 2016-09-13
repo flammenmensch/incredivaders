@@ -8,6 +8,6 @@ export default class Enemies extends Phaser.Group {
     this.createMultiple(enemyCount, enemySpriteKey);
 
     this.enemyLauncher = new enemyLauncherClass;
-    this.enemyLauncher.launch(this);
+    this.enemyLauncher.scheduleLaunch(this);
   }
 }

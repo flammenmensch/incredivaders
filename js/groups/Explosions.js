@@ -1,10 +1,10 @@
 export default class Explosions extends Phaser.Group {
-  constructor(game) {
+  constructor(game, animation) {
     super(game);
 
     this.enableBody = true;
     this.physicsBodyType = Phaser.Physics.ARCADE;
-    this.createMultiple(30, 'redExplosion');
+    this.createMultiple(30, animation);
     this.setAll('anchor.x', .5);
     this.setAll('anchor.y', .5);
     this.forEach(explosion => {
