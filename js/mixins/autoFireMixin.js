@@ -10,7 +10,7 @@ export default function() {
       withinFireBounds() {
         return (
           (this.x > 0 && this.x < this.game.width) &&
-          (this.y > 0 && this.y < (this.game.height * .5))
+          (this.y > 100 && this.y < (this.game.height * .5) )
         );
       }
     }

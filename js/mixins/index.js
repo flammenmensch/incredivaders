@@ -7,6 +7,8 @@ import autoFireMixinFactory from './autoFireMixin';
 import bankMixinFactory from './bankMixin';
 import waveMovementFactory from './waveMovementMixin';
 import accelerateAfterFactory from './accelerateAfterMixin';
+import simpleMovementFactory from './simpleMovementMixin';
+import simpleRotationFactory from './simpleRotationMixin';
 
 const mixins = {
   armedEntityMixinFactory,
@@ -17,7 +19,9 @@ const mixins = {
   randomMovementMixinFactory,
   randomRotationMixinFactory,
   waveMovementFactory,
-  accelerateAfterFactory
+  accelerateAfterFactory,
+  simpleMovementFactory,
+  simpleRotationFactory
 };
 
 export default mixins;

@@ -7,7 +7,10 @@ export default class Enemies extends Phaser.Group {
     this.physicsBodyType = Phaser.Physics.ARCADE;
     this.createMultiple(enemyCount, enemySpriteKey);
 
-    this.enemyLauncher = new enemyLauncherClass;
-    this.enemyLauncher.launch(this);
+    this.enemyLauncher = new enemyLauncherClass(this);
+    this.enemyLauncher.scheduleLaunch();
+  }
+  launch() {
+    this.enemyLauncher.launchImmediately();
   }
 }

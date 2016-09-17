@@ -5,5 +5,10 @@ export default class Enemy extends Phaser.Sprite {
     this.anchor.setTo(.5, .5);
     this.outOfBoundsKill = true;
     this.checkWorldBounds = true;
+    this.health = 25;
+  }
+  reset() {
+    super.reset(...arguments);
+    this.health = 25;
   }
 }
