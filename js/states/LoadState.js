@@ -17,6 +17,10 @@ export default class LoadState extends Phaser.State {
     this.game.load.image('meteorTiny1', 'assets/images/meteors/meteorBrown_tiny1.png');
     this.game.load.image('meteorTiny2', 'assets/images/meteors/meteorBrown_tiny2.png');
 
+    this.game.load.image('powerUpShield', 'assets/images/power-ups/powerupYellow_shield.png');
+    this.game.load.image('powerUpStar', 'assets/images/power-ups/powerupYellow_star.png');
+    this.game.load.image('powerUpBolt', 'assets/images/power-ups/powerupYellow_bolt.png');
+
     this.game.load.spritesheet('redExplosion', 'assets/images/explosion_9.png', 256, 256);
     this.game.load.spritesheet('blueExplosion', 'assets/images/explosion_1.png', 196, 237);
   }
