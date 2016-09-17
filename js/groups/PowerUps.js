@@ -1,5 +1,6 @@
 import simpleMovementFactory from '../mixins/simpleMovementMixin';
 import mix from '../mixins/mix';
+import SoundGroup from '../utils/SoundGroup';
 
 export default class PowerUps extends Phaser.Group {
   constructor(game, sprites=[]) {
@@ -7,8 +8,8 @@ export default class PowerUps extends Phaser.Group {
     this.enableBody = true;
     this.classType = mix(PowerUp).with(simpleMovementFactory(200));
     this.physicsBodyType = Phaser.Physics.ARCADE;
+
     sprites.forEach(sprite => {
-      console.log('Add', sprite);
       this.createMultiple(sprite.quantity, sprite.key);
     });
   }
@@ -25,7 +26,12 @@ export default class PowerUps extends Phaser.Group {
 }
 
 class PowerUp extends Phaser.Sprite {
+  constructor() {
+    super(...arguments);
+    this.__sfx = new SoundGroup(this.game, ['pickup1', 'pickup2', 'pickup3'], false);
+  }
   applyTo(entity) {
+    this.__sfx.play();
     switch (this.key) {
       case 'powerUpShield':
         entity.health = this.game.math.min((entity.health || 0) + 25, 100);

@@ -35,6 +35,11 @@ const createBlueEnemy = () => mix(Enemy).with(
   mixins.accelerateAfterFactory(100, 75)
 );
 
+const createUfo = (target) => mix(Enemy).with(
+  mixins.randomMovementMixinFactory(),
+  mixins.simpleRotationFactory()
+);
+
 const createMeteor = (rotation, speed) => mix(Enemy).with(
   mixins.simpleRotationFactory(rotation, Math.random() >= 0.5),
   mixins.simpleMovementFactory(speed)
@@ -54,9 +59,10 @@ export default class PlayState extends Phaser.State {
 
     this.player = this.game.add.existing(new PlayerClass(this.game, this.game.width * .5, this.game.height - 44));
     this.enemies = [
-      this.game.add.existing(new Enemies(this.game, createBlackEnemy(), 'enemyBlack', queueLaunchStrategy(300, 1500, 50), 10)),
+      this.game.add.existing(new Enemies(this.game, createBlackEnemy(), 'enemyBlack', queueLaunchStrategy(750, 1500, 50), 10)),
       this.game.add.existing(new Enemies(this.game, createRedEnemy(this.player), 'enemyRed', randomLaunchStrategy(3000, 6000), 5)),
-      this.game.add.existing(new Enemies(this.game, createBlueEnemy(), 'enemyBlue', randomLaunchStrategy(5000, 7500), 5))
+      this.game.add.existing(new Enemies(this.game, createBlueEnemy(), 'enemyBlue', randomLaunchStrategy(5000, 7500), 5)),
+      this.game.add.existing(new Enemies(this.game, createUfo(), 'ufoRed', randomLaunchStrategy(15000, 17500), 2))
     ];
     this.meteors = [
       this.game.add.existing(new Enemies(this.game, createMeteor(3, 300), 'meteorMed1', randomLaunchStrategy(8000, 16000), 5)),
@@ -68,7 +74,7 @@ export default class PlayState extends Phaser.State {
       { quantity: 3, key: 'powerUpStar' },
       { quantity: 3, key: 'powerUpShield' },
     ]));
-    this.explosions = this.game.add.existing(new Explosions(this.game, 'redExplosion'));
+    this.explosions = this.game.add.existing(new Explosions(this.game, ['explosion1', 'explosion2'], ['explosionSfx1', 'explosionSfx2', 'explosionSfx3']));
 
     this.playerBullets = this.player.weapon.bullets;
     this.enemyBullets = this.enemies
@@ -84,6 +90,9 @@ export default class PlayState extends Phaser.State {
       `Health: ${this.player.health}%`,
       { font: '20px Arial', fill: '#fff' }
     );
+
+    this.laserSfx = this.game.add.audio('laserSfx');
+    this.laserSfx.allowMultiple = true;
   }
   update() {
     this.game.physics.arcade.overlap(this.player, this.enemies, this.collideShips, null, this);
