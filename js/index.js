@@ -1,4 +1,7 @@
+import 'pixi.js';
+import 'p2';
 import 'phaser';
+
 import LoadState from './states/LoadState';
 import PlayState from './states/PlayState';
 
