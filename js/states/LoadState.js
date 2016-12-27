@@ -1,5 +1,10 @@
 export default class LoadState extends Phaser.State {
   preload() {
+    this.progressText = this.game.add.text(10, 10, 'Loading... 0%', {
+      font: '18px Consolas, "Courier New", monotype',
+      fill: '#ffffff'
+    });
+
     this.game.load.image('space', 'assets/images/nebula.jpg');
     this.game.load.image('player', 'assets/images/playerShip1_orange.png');
     this.game.load.image('enemyBlack', 'assets/images/enemyBlack3.png');
@@ -34,8 +39,15 @@ export default class LoadState extends Phaser.State {
     this.game.load.audio('pickup1', 'assets/sounds/pickup.mp3');
     this.game.load.audio('pickup2', 'assets/sounds/pickup-2.mp3');
     this.game.load.audio('pickup3', 'assets/sounds/pickup-3.mp3');
+
+    this.game.load.onFileComplete.add(this.fileComplete, this);
+    this.game.load.onLoadComplete.add(this.loadComplete, this);
+    this.game.load.start();
   }
-  create() {
+  fileComplete(progress) {
+    this.progressText.setText(`Loading... ${progress}%`);
+  }
+  loadComplete() {
     this.game.state.start('play');
   }
 }
