@@ -31,6 +31,7 @@ const defaultWeapon = (isEnemy, owner) => {
 const laserBuilder = (isEnemy, target, owner) => {
   const weapon = defaultWeapon(isEnemy, owner);
   weapon.bulletSpeed = 600;
+  weapon.multiFire = true;
   weapon.fireRate = isEnemy ? 500 : 200;
   weapon.fireRateVariance = isEnemy ? 150 : 0;
   weapon.createBullets(10, WeaponType.LASER);

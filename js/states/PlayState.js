@@ -16,7 +16,7 @@ const createBlackEnemy = () => mix(Enemy).with(
   mixins.waveMovementFactory(180, 50),
   mixins.randomRotationMixinFactory(),
   mixins.bankMixinFactory(400),
-  mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, true)),
+  mixins.armedEntityMixinFactory([ { x: -5, y: 0 }, { x: 5, y: 0 } ], weaponFactory(WeaponType.LASER, true)),
   mixins.autoFireMixinFactory(),
   mixins.scoreFactory(150)
 );
@@ -25,7 +25,7 @@ const createRedEnemy = (target) => mix(Enemy).with(
   mixins.randomMovementMixinFactory(),
   mixins.randomRotationMixinFactory(),
   mixins.bankMixinFactory(),
-  mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.ROCKET, true, target)),
+  mixins.armedEntityMixinFactory({ x: 0, y: 0 }, weaponFactory(WeaponType.ROCKET, true, target)),
   mixins.autoFireMixinFactory(),
   mixins.scoreFactory(200)
 );
@@ -52,7 +52,7 @@ const createMeteor = (rotation, speed) => mix(Enemy).with(
 export default class PlayState extends Phaser.State {
   create() {
     const PlayerClass = mix(Player).with(
-      mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, false)),
+      mixins.armedEntityMixinFactory([ { x: -15, y: 0 }, { x: 15, y: 0 } ], weaponFactory(WeaponType.LASER, false)),
       mixins.bankMixinFactory(),
       mixins.arrowMovementMixinFactory(),
       mixins.manualFireMixinFactory()
