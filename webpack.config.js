@@ -19,6 +19,7 @@ module.exports = {
     path: path.join(__dirname, 'docs'),
     filename: 'bundle.js'
   },
+  devTool: 'source-map',
   module: {
     loaders: [
       {
