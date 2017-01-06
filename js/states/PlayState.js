@@ -13,11 +13,12 @@ import randomLaunchStrategy from '../strategies/randomLaunchStrategy';
 import queueLaunchStrategy from '../strategies/queueLaunchStrategy';
 
 const createBlackEnemy = () => mix(Enemy).with(
-  mixins.waveMovementFactory(),
+  mixins.waveMovementFactory(180, 50),
   mixins.randomRotationMixinFactory(),
-  mixins.bankMixinFactory(180),
+  mixins.bankMixinFactory(400),
   mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.LASER, true)),
-  mixins.autoFireMixinFactory()
+  mixins.autoFireMixinFactory(),
+  mixins.scoreFactory(150)
 );
 
 const createRedEnemy = (target) => mix(Enemy).with(
@@ -25,19 +26,22 @@ const createRedEnemy = (target) => mix(Enemy).with(
   mixins.randomRotationMixinFactory(),
   mixins.bankMixinFactory(),
   mixins.armedEntityMixinFactory(0, 0, weaponFactory(WeaponType.ROCKET, true, target)),
-  mixins.autoFireMixinFactory()
+  mixins.autoFireMixinFactory(),
+  mixins.scoreFactory(200)
 );
 
 const createBlueEnemy = () => mix(Enemy).with(
   mixins.randomMovementMixinFactory(400),
   mixins.randomRotationMixinFactory(),
   mixins.bankMixinFactory(400),
-  mixins.accelerateAfterFactory(100, 75)
+  mixins.accelerateAfterFactory(100, 75),
+  mixins.scoreFactory(300)
 );
 
 const createUfo = (target) => mix(Enemy).with(
   mixins.randomMovementMixinFactory(),
-  mixins.simpleRotationFactory()
+  mixins.simpleRotationFactory(),
+  mixins.scoreFactory(500)
 );
 
 const createMeteor = (rotation, speed) => mix(Enemy).with(
@@ -53,6 +57,8 @@ export default class PlayState extends Phaser.State {
       mixins.arrowMovementMixinFactory(),
       mixins.manualFireMixinFactory()
     );
+
+    this.gameScore = 0;
 
     this.game.add.existing(new StarField(this.game));
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -84,11 +90,19 @@ export default class PlayState extends Phaser.State {
       .filter(enemy => enemy.weapon !== undefined) // Armed enemies only
       .map(enemy => enemy.weapon.bullets);
 
+    const fontConfig = { font: '20px Courier New', fill: '#fff' };
+
     this.health = this.game.add.text(
       this.game.world.width - 150,
       10,
-      `Health: ${this.player.health}%`,
-      { font: '20px Arial', fill: '#fff' }
+      `Health: 0`,
+      fontConfig
+    );
+
+    this.score = this.game.add.text(
+      10, 10,
+      `Score: 0`,
+      fontConfig
     );
 
     this.laserSfx = this.game.add.audio('laserSfx');
@@ -102,41 +116,30 @@ export default class PlayState extends Phaser.State {
     this.game.physics.arcade.overlap([ this.playerBullets, this.enemyBullets ], this.meteors, this.hitMeteor, null, this);
     this.game.physics.arcade.overlap(this.player, this.powerups, this.collectPowerUp, null, this);
     this.health.text = `Health: ${this.player.health}%`;
+    this.score.text = `Score: ${this.gameScore}`;
 
-    if (this.player.health <= 0 && this.player.alive) {
-      this.explosions.explode(this.player);
-      this.player.kill();
-    }
-
-    //  Game over?
     if (!this.player.alive) {
-      const tapRestart = this.game.input.onTap.addOnce(() => {
+      const spaceKey = this.game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+      const tapRestart = spaceKey.onDown.addOnce(() => {
         tapRestart.detach();
         this.restart();
       });
     }
   }
   collideShips(player, enemy) {
-    this.explosions.explode(enemy);
-    enemy.kill();
-    player.damage(75);
+    this.damageTarget(enemy, 100, true, true);
+    this.damageTarget(player, 75);
   }
   collideMeteors(entity) {
-    this.explosions.explode(entity);
-    entity.kill();
+    this.damageTarget(entity, 100);
   }
   hitEnemy(enemy, bullet) {
     bullet.kill();
-    enemy.damage(Math.round(Math.random() * 10) + 20);
-    if (enemy.health <= 0) {
-      this.explosions.explode(enemy);
-      this.powerups.addPowerup(enemy.x, enemy.y);
-      enemy.kill();
-    }
+    this.damageTarget(enemy, Math.round(Math.random() * 10) + 20, true, true);
   }
   hitPlayer(player, bullet) {
     bullet.kill();
-    player.damage(5);
+    this.damageTarget(player, 5);
   }
   hitMeteor(bullet) {
     bullet.kill();
@@ -146,8 +149,20 @@ export default class PlayState extends Phaser.State {
     powerup.kill();
   }
   restart() {
-    this.player.revive();
-    this.player.health = 100;
+    this.player.revive(100);
     this.player.body.velocity.x = 0;
+    this.gameScore = 0;
+  }
+  damageTarget(target, amount, collectScore=false, addPowerUp=false) {
+    target.damage(amount);
+    if (!target.alive) {
+      this.explosions.explode(target);
+      if (collectScore) {
+        this.gameScore += (isNaN(target.score) ? 0 : target.score);
+      }
+      if (addPowerUp) {
+        this.powerups.addPowerup(target.x, target.y);
+      }
+    }
   }
 }

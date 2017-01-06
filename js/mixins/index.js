@@ -9,6 +9,7 @@ import waveMovementFactory from './waveMovementMixin';
 import accelerateAfterFactory from './accelerateAfterMixin';
 import simpleMovementFactory from './simpleMovementMixin';
 import simpleRotationFactory from './simpleRotationMixin';
+import scoreFactory from './scoreMixin';
 
 const mixins = {
   armedEntityMixinFactory,
@@ -21,7 +22,8 @@ const mixins = {
   waveMovementFactory,
   accelerateAfterFactory,
   simpleMovementFactory,
-  simpleRotationFactory
+  simpleRotationFactory,
+  scoreFactory
 };
 
 export default mixins;
